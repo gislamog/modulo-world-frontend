@@ -1,0 +1,15 @@
+# Development image. Source is bind-mounted from the host and Vite serves
+# it with HMR, so nothing is copied in beyond the dependency manifests.
+# Production builds are a separate image (story #22).
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Only the manifests, so this layer is cached until dependencies change.
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Vite must listen on all interfaces: bound to localhost it would only be
+# reachable from inside the container, not from nginx.
+EXPOSE 3000
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
