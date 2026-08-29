@@ -47,6 +47,19 @@ Postgres publishes no host port in production; it is reachable only on the inter
 network, so the API is the sole path to the data. Locally a port is published for GUI clients
 via the infrastructure repo's `compose.override.yaml`.
 
+### Containers
+
+Four containers, which do not map one-to-one onto the three repositories. The infrastructure
+repository builds nothing of its own: it holds the Compose files and Nginx config that define
+and wire up the others.
+
+| Container | Built from | Role |
+|---|---|---|
+| `nginx` | official image plus config in the infrastructure repo | Routes by path prefix. The only container publishing a web port |
+| `frontend` | this repository, `Dockerfile.dev` | SvelteKit dev server with hot reload |
+| `api` | the backend repository, `Dockerfile.dev` | NestJS API, waits for a healthy database before starting |
+| `postgres` | official `postgres:17.2-alpine` image | Database. No host port in production |
+
 ### Tools
 
 | Tool | Purpose |
@@ -87,17 +100,31 @@ in full, as `Closes gislamog/modulo-world-frontend#N`, or it closes nothing.
 
 ## Setup
 
+### Full stack
+
+One command, from the infrastructure repository, starts all four containers with hot reload:
+
+```bash
+cd ../modulo-world-infrastructure
+cp .env.example .env   # then fill in the credentials
+docker compose up -d
+```
+
+The site is then at http://localhost (or whichever `HTTP_PORT` is set in that `.env`).
+Frontend edits hot reload, and backend edits trigger a Nest watch-mode restart, both without
+rebuilding anything.
+
+### Frontend alone
+
+For UI work that does not call the API:
+
 ```bash
 npm install
 cp .env.example .env
 npm run dev
 ```
 
-The app runs at http://localhost:5173.
-
-In normal development the full stack runs through Docker Compose from the infrastructure
-repository, which puts the frontend and API on a single origin behind Nginx. Running
-`npm run dev` alone is fine for UI work that does not call the API.
+That runs at http://localhost:5173, without Nginx, the API, or the database.
 
 ## Commands
 
