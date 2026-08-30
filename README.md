@@ -53,41 +53,41 @@ Four containers, which do not map one-to-one onto the three repositories. The in
 repository builds nothing of its own: it holds the Compose files and Nginx config that define
 and wire up the others.
 
-| Container | Built from | Role |
-|---|---|---|
-| `nginx` | official image plus config in the infrastructure repo | Routes by path prefix. The only container publishing a web port |
-| `frontend` | this repository, `Dockerfile.dev` | SvelteKit dev server with hot reload |
-| `api` | the backend repository, `Dockerfile.dev` | NestJS API, waits for a healthy database before starting |
-| `postgres` | official `postgres:17.2-alpine` image | Database. No host port in production |
+| Container  | Built from                                            | Role                                                            |
+| ---------- | ----------------------------------------------------- | --------------------------------------------------------------- |
+| `nginx`    | official image plus config in the infrastructure repo | Routes by path prefix. The only container publishing a web port |
+| `frontend` | this repository, `Dockerfile.dev`                     | SvelteKit dev server with hot reload                            |
+| `api`      | the backend repository, `Dockerfile.dev`              | NestJS API, waits for a healthy database before starting        |
+| `postgres` | official `postgres:17.2-alpine` image                 | Database. No host port in production                            |
 
 ### Tools
 
-| Tool | Purpose |
-|---|---|
-| **SvelteKit 2** | Frontend framework. File-based routing, SSR, and the game UI |
-| **Svelte 5** | Component runtime, using the runes reactivity model |
-| **TypeScript 6** | Static typing across both frontend and backend |
-| **Vite 8** | Dev server with hot reload, and production bundler |
-| **adapter-node** | Builds SvelteKit to a plain Node server, since the site is self-hosted |
-| **NestJS 12** | Backend framework. Modular structure, dependency injection |
-| **Prisma** | Type-safe database client and migration tool *(story #7)* |
-| **PostgreSQL 17** | Relational database. Scores, progress, game state |
-| **Docker Compose** | Runs every service, identically on Windows and the server |
-| **Nginx** | Reverse proxy, TLS termination, single-origin routing |
-| **Vitest 4** | Unit and integration tests in both repositories |
-| **ESLint + Prettier** | Linting and formatting (frontend); Oxlint in the backend |
-| **Oracle Cloud** | Always Free ARM64 host running Ubuntu 22.04 |
+| Tool                  | Purpose                                                                |
+| --------------------- | ---------------------------------------------------------------------- |
+| **SvelteKit 2**       | Frontend framework. File-based routing, SSR, and the game UI           |
+| **Svelte 5**          | Component runtime, using the runes reactivity model                    |
+| **TypeScript 6**      | Static typing across both frontend and backend                         |
+| **Vite 8**            | Dev server with hot reload, and production bundler                     |
+| **adapter-node**      | Builds SvelteKit to a plain Node server, since the site is self-hosted |
+| **NestJS 12**         | Backend framework. Modular structure, dependency injection             |
+| **Prisma**            | Type-safe database client and migration tool _(story #7)_              |
+| **PostgreSQL 17**     | Relational database. Scores, progress, game state                      |
+| **Docker Compose**    | Runs every service, identically on Windows and the server              |
+| **Nginx**             | Reverse proxy, TLS termination, single-origin routing                  |
+| **Vitest 4**          | Unit and integration tests in both repositories                        |
+| **ESLint + Prettier** | Linting and formatting (frontend); Oxlint in the backend               |
+| **Oracle Cloud**      | Always Free ARM64 host running Ubuntu 22.04                            |
 
 ### Repository layout
 
 Three repositories, split by deployment unit rather than by feature. Each builds into its own
 container image.
 
-| Repository | Contains | Does not contain |
-|---|---|---|
-| **frontend** | SvelteKit app, game implementations, shared UI, all project issues | API logic, database access |
-| **backend** | NestJS API, Prisma schema and migrations, business rules | UI, styling |
-| **infrastructure** | Compose files, Nginx config, deployment and TLS setup | Application code |
+| Repository         | Contains                                                           | Does not contain           |
+| ------------------ | ------------------------------------------------------------------ | -------------------------- |
+| **frontend**       | SvelteKit app, game implementations, shared UI, all project issues | API logic, database access |
+| **backend**        | NestJS API, Prisma schema and migrations, business rules           | UI, styling                |
+| **infrastructure** | Compose files, Nginx config, deployment and TLS setup              | Application code           |
 
 Issues for all three live in this repository, because the project is too small to justify
 three issue trackers. A consequence worth knowing: a commit in another repo must write the reference
