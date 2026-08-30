@@ -42,3 +42,35 @@ jobs:
       # tsc would skip the components entirely.
       - name: Typecheck
         run: npm run check
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    # A separate job from lint so the two failure modes are distinguishable
+    # in the checks list without opening the logs.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Runs both projects: 'server' for plain TypeScript, 'client' in
+      # jsdom for the components.
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      # Reported, not gated. There is no coverage threshold on purpose:
+      # a number set this early gets satisfied rather than earned.
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: coverage/
+          retention-days: 14
