@@ -1,22 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { env as privateEnv } from '$env/dynamic/private';
+import { describe, it, expect, vi } from 'vitest';
 import { fetchGame, fetchGames, inputWarning, type Game } from './games';
-
-// $env/dynamic/private is read when the module loads, so mutating
-// process.env in a hook is too late to change it. Mocking the module
-// gives an object the tests can rewrite between cases.
-//
-// It matters because these run in Node, where the code cannot tell a test
-// from server-side rendering, and the dev container really does set
-// API_INTERNAL_URL. Left alone, the same-origin tests below would take
-// the internal cross-origin path and never call the fetch they inject.
-vi.mock('$env/dynamic/private', () => ({ env: {} as Record<string, string> }));
-
-beforeEach(() => {
-	// Same-origin by default: the browser's path, and what most of these
-	// tests are about. The internal path has its own describe below.
-	delete (privateEnv as Record<string, string | undefined>).API_INTERNAL_URL;
-});
 
 function makeGame(overrides: Partial<Game> = {}): Game {
 	return {
@@ -113,49 +96,47 @@ describe('fetchGame', () => {
 // The SSR path inside Docker. A relative URL cannot be resolved from the
 // frontend container -- it would point at the published origin, which
 // there is the frontend itself -- so the server calls the API container
-// directly. That call is cross-origin, and SvelteKit's fetch enforces
-// CORS on it, so it has to use the platform fetch instead.
+// directly, with the platform fetch, since SvelteKit's enforces CORS on a
+// cross-origin call.
 //
 // Both of those went wrong in turn and each returned a 500 on every page.
-// These pin the shape of the fix.
+// The target arrives as an argument from a server-only module, because
+// reading it here would mean importing private env into a file the
+// browser can reach -- which SvelteKit refuses to build.
 describe('the internal server-side path', () => {
-	beforeEach(() => {
-		(privateEnv as Record<string, string | undefined>).API_INTERNAL_URL = 'http://api:3000';
-	});
-
 	it('calls the API container by an absolute URL', async () => {
-		const platformFetch = vi
-			.spyOn(globalThis, 'fetch')
-			.mockResolvedValue(jsonResponse([makeGame()]));
+		const call = vi.fn().mockResolvedValue(jsonResponse([makeGame()]));
 
-		await fetchGames(vi.fn());
+		await fetchGames(vi.fn(), { base: 'http://api:3000/api', call });
 
-		expect(platformFetch).toHaveBeenCalledWith('http://api:3000/api/games');
-
-		platformFetch.mockRestore();
+		expect(call).toHaveBeenCalledWith('http://api:3000/api/games');
 	});
 
-	it("bypasses SvelteKit's fetch, which would fail CORS on that origin", async () => {
-		const platformFetch = vi
-			.spyOn(globalThis, 'fetch')
-			.mockResolvedValue(jsonResponse([makeGame()]));
+	it("uses the target's fetch, not the one SvelteKit supplied", async () => {
+		const call = vi.fn().mockResolvedValue(jsonResponse([makeGame()]));
 		const kitFetch = vi.fn();
 
-		await fetchGames(kitFetch);
+		await fetchGames(kitFetch, { base: 'http://api:3000/api', call });
 
+		// SvelteKit's fetch would fail CORS on that origin.
 		expect(kitFetch).not.toHaveBeenCalled();
-
-		platformFetch.mockRestore();
 	});
 
-	it('keeps the same-origin path on the caller fetch', async () => {
-		delete (privateEnv as Record<string, string | undefined>).API_INTERNAL_URL;
+	it('encodes the slug on the internal path too', async () => {
+		const call = vi.fn().mockResolvedValue(jsonResponse(makeGame()));
+
+		await fetchGame(vi.fn(), 'a/b', { base: 'http://api:3000/api', call });
+
+		expect(call).toHaveBeenCalledWith('http://api:3000/api/games/a%2Fb');
+	});
+
+	it('falls back to the same-origin path when there is no target', async () => {
 		const kitFetch = vi.fn().mockResolvedValue(jsonResponse([]));
 
-		await fetchGames(kitFetch);
+		// Null is what the server module returns when API_INTERNAL_URL is
+		// unset, and what the browser always passes.
+		await fetchGames(kitFetch, null);
 
-		// Relative, and through the fetch SvelteKit supplies: the browser
-		// gets cookie-aware requests and an inlined response.
 		expect(kitFetch).toHaveBeenCalledWith('/api/games');
 	});
 });

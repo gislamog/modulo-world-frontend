@@ -5,9 +5,8 @@
 // configuration in, and a presentational component that only needs to
 // label a card should not drag that along.
 
-import { browser } from '$app/environment';
 import { env } from '$env/dynamic/public';
-import { env as privateEnv } from '$env/dynamic/private';
+import type { ApiTarget } from './api-target.server';
 import type { Game } from './game-types';
 
 export type { Game, InputRequirement } from './game-types';
@@ -17,46 +16,27 @@ export { inputWarning } from './game-types';
  * Resolved at request time rather than build time.
  *
  * The container image is built once and runs in dev and production, so an
- * origin baked in at build would be wrong in one of them.
- *
- * The browser and the SSR process need different values. The browser is
- * served through Nginx on a single origin, so a path is correct there.
- * During SSR the same path would resolve against the request's own origin
- * -- localhost:8080 in Docker -- which inside the container is the
- * frontend itself, where nothing serves the API. So the server calls the
- * API container directly by its service name.
+ * origin baked in at build would be wrong in one of them. Requests are
+ * proxied through Nginx on the same origin, so this is a path.
  */
 function apiBase(): string {
-	if (!browser && privateEnv.API_INTERNAL_URL) {
-		return `${privateEnv.API_INTERNAL_URL}/api`;
-	}
-
 	return env.PUBLIC_API_BASE_URL || '/api';
 }
 
 /**
- * The base URL to call, paired with the fetch that may call it.
+ * Where to send the call, and what to send it with.
  *
- * An absolute base means the internal SSR call to the API container,
- * which is cross-origin. SvelteKit's fetch applies browser CORS rules and
- * so rejects it for want of an Access-Control-Allow-Origin header; its
- * benefits -- cookie forwarding and inlining the response into the page
- * -- only apply same-origin anyway, so that call uses the platform fetch.
+ * The default is the relative path through Nginx and the caller's fetch:
+ * correct in the browser, and what the tests inject.
  *
- * A relative base is same-origin through Nginx and keeps the caller's
- * fetch, which is what the browser wants and what the tests inject.
+ * Server-side rendering inside Docker cannot use that path and passes an
+ * explicit target instead. It comes from a server-only module rather than
+ * being read here, because $env/dynamic/private may not be imported by
+ * anything the browser can reach -- and a universal load module reaches
+ * this file from both sides.
  */
-function apiTarget(fetch: typeof globalThis.fetch): {
-	base: string;
-	call: typeof globalThis.fetch;
-} {
-	const base = apiBase();
-	const crossOrigin = /^https?:\/\//.test(base);
-
-	return {
-		base,
-		call: crossOrigin ? globalThis.fetch : fetch
-	};
+function resolveTarget(fetch: typeof globalThis.fetch, target?: ApiTarget | null): ApiTarget {
+	return target ?? { base: apiBase(), call: fetch };
 }
 
 /**
@@ -66,8 +46,11 @@ function apiTarget(fetch: typeof globalThis.fetch): {
  * credential-aware and its result is inlined into the page, sparing a
  * second request on hydration.
  */
-export async function fetchGames(fetch: typeof globalThis.fetch): Promise<Game[]> {
-	const { base, call } = apiTarget(fetch);
+export async function fetchGames(
+	fetch: typeof globalThis.fetch,
+	target?: ApiTarget | null
+): Promise<Game[]> {
+	const { base, call } = resolveTarget(fetch, target);
 	const response = await call(`${base}/games`);
 
 	if (!response.ok) {
@@ -85,9 +68,10 @@ export async function fetchGames(fetch: typeof globalThis.fetch): Promise<Game[]
  */
 export async function fetchGame(
 	fetch: typeof globalThis.fetch,
-	slug: string
+	slug: string,
+	target?: ApiTarget | null
 ): Promise<Game | null> {
-	const { base, call } = apiTarget(fetch);
+	const { base, call } = resolveTarget(fetch, target);
 	const response = await call(`${base}/games/${encodeURIComponent(slug)}`);
 
 	if (response.status === 404) {
