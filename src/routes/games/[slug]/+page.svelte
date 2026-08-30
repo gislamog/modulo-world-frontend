@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import SaveProgressNotice from '$lib/components/SaveProgressNotice.svelte';
+	import { gameComponent } from '$lib/game-component';
 	import { inputWarning } from '$lib/game-types';
 	import type { PageData } from './$types';
 
@@ -11,6 +12,10 @@
 	let { data }: Props = $props();
 
 	const warning = $derived(inputWarning(data.game.inputRequirement));
+
+	// Keyed on the slug so navigating between games swaps the component
+	// rather than reusing the previous game's.
+	const Game = $derived(gameComponent(data.game.slug));
 </script>
 
 <svelte:head>
@@ -43,10 +48,14 @@
 	{/if}
 
 	<section class="stage" aria-label="Game">
-		<!-- The per-game component mounts here. Until the first game ships,
-		     the route resolving and 404ing correctly is what #19 delivers;
-		     the component is the other half of "a row plus a component". -->
-		<p class="placeholder">This game is not playable yet.</p>
+		<!-- The per-game component, found by slug. A registered game with no
+		     component yet keeps the placeholder rather than erroring: the row
+		     may exist before the game is written. -->
+		{#if Game}
+			<Game />
+		{:else}
+			<p class="placeholder">This game is not playable yet.</p>
+		{/if}
 	</section>
 </main>
 
@@ -103,9 +112,16 @@
 		align-items: center;
 		justify-content: center;
 		min-height: 20rem;
-		border: 1px dashed #ccc;
+		border: 1px solid #e0e0e0;
 		border-radius: 0.5rem;
 		background: #fafafa;
+	}
+
+	/* The dashed, hollow look belongs to the empty state, so it applies to
+	   the placeholder rather than to the stage that holds a real game. */
+	.stage:has(.placeholder) {
+		border-style: dashed;
+		border-color: #ccc;
 	}
 
 	.placeholder {
