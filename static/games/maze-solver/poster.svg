@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="hsl(295 55% 32%)"/>
+<stop offset="1" stop-color="hsl(335 60% 20%)"/>
+</linearGradient>
+<radialGradient id="r" cx="0.3" cy="0.25" r="0.75">
+<stop offset="0" stop-color="hsl(295 70% 62%)" stop-opacity="0.85"/>
+<stop offset="1" stop-color="hsl(295 70% 62%)" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<rect width="800" height="500" fill="url(#r)"/>
+<rect x="150" y="176.14615776576102" width="22" height="153.85384223423898" rx="4" fill="hsl(335 85% 78%)" opacity="0.7489417407428846"/><rect x="186" y="244.7632661787793" width="22" height="85.2367338212207" rx="4" fill="hsl(335 85% 78%)" opacity="0.7426754795247689"/><rect x="222" y="187.17581810429692" width="22" height="142.82418189570308" rx="4" fill="hsl(335 85% 78%)" opacity="0.7084812105400488"/><rect x="258" y="269.09689877647907" width="22" height="60.903101223520935" rx="4" fill="hsl(335 85% 78%)" opacity="0.42741314743179826"/><rect x="294" y="199.84009782783687" width="22" height="130.15990217216313" rx="4" fill="hsl(335 85% 78%)" opacity="0.4974106175592169"/><rect x="330" y="185.03383805509657" width="22" height="144.96616194490343" rx="4" fill="hsl(335 85% 78%)" opacity="0.7856954084942117"/><rect x="366" y="283.21403060108423" width="22" height="46.78596939891577" rx="4" fill="hsl(335 85% 78%)" opacity="0.7462280134437606"/><rect x="402" y="270.1976444432512" width="22" height="59.80235555674881" rx="4" fill="hsl(335 85% 78%)" opacity="0.7993052951293066"/><rect x="438" y="284.52454370446503" width="22" height="45.47545629553497" rx="4" fill="hsl(335 85% 78%)" opacity="0.7677453689044341"/><rect x="474" y="203.28033692669123" width="22" height="126.71966307330877" rx="4" fill="hsl(335 85% 78%)" opacity="0.6185000371420756"/><rect x="510" y="235.90399807319045" width="22" height="94.09600192680955" rx="4" fill="hsl(335 85% 78%)" opacity="0.7512108881724998"/><rect x="546" y="224.7656596498564" width="22" height="105.23434035014361" rx="4" fill="hsl(335 85% 78%)" opacity="0.8374322043033317"/><rect x="582" y="210.99724396131933" width="22" height="119.00275603868067" rx="4" fill="hsl(335 85% 78%)" opacity="0.5272321047028526"/><rect x="618" y="142.89648914244026" width="22" height="187.10351085755974" rx="4" fill="hsl(335 85% 78%)" opacity="0.7349028801778331"/>
+</svg>

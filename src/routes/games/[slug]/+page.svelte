@@ -64,10 +64,6 @@
 		max-width: 60rem;
 		margin: 0 auto;
 		padding: 2rem 1rem 4rem;
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
 	}
 
 	nav {
@@ -114,7 +110,9 @@
 		min-height: 20rem;
 		border: 1px solid #e0e0e0;
 		border-radius: 0.5rem;
-		background: #fafafa;
+		/* The page behind is now the shell's sunken grey, so the stage
+		   states its own surface rather than blending into it. */
+		background: #fff;
 	}
 
 	/* The dashed, hollow look belongs to the empty state, so it applies to

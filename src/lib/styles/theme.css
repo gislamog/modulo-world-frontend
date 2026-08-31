@@ -1,0 +1,64 @@
+/* Brand tokens, taken from the logo artwork in static/branding.
+ *
+ * Defined once here rather than repeated as literals in each component's
+ * <style>, because the navy and the indigo appear in the top bar, the
+ * sidebar, the focus rings, and the cards, and they have to stay the same
+ * colour in all four.
+ *
+ * Every text colour below is stated with its contrast ratio against the
+ * surface it is used on. The existing components hold themselves to WCAG
+ * AA (4.5:1 for body text), and these keep that going. */
+
+:root {
+	/* Brand */
+	--mw-navy: #152a5e;
+	--mw-navy-deep: #0f1f47;
+	--mw-indigo: #4f52e8;
+	--mw-violet: #8b5cf6;
+	--mw-gold: #fbbf24;
+
+	/* Surfaces */
+	--mw-surface: #ffffff;
+	--mw-surface-sunken: #f6f7fb;
+	--mw-border: #e2e5ee;
+	--mw-border-strong: #c7ccdb;
+
+	/* Text. Ratios are against --mw-surface. */
+	--mw-text: #1a1a1a; /* 15.3:1 */
+	--mw-text-muted: #595959; /* 7.0:1  -- the darkest grey that still passes */
+	--mw-link: #0b57d0; /* 6.3:1 */
+	--mw-warning: #8a4b00; /* 7.7:1 */
+
+	/* On the navy bar. */
+	--mw-on-navy: #ffffff; /* 13.6:1 on --mw-navy */
+	--mw-on-navy-muted: #c3cbe4; /* 8.0:1 on --mw-navy */
+
+	/* Chrome */
+	--mw-topbar-height: 3.75rem;
+	/* Collapsed, and what the content actually reserves: the nav widens
+	   over the page on hover rather than pushing it. */
+	--mw-rail-width: 4.5rem;
+	--mw-sidebar-width: 15.5rem;
+	--mw-radius: 0.5rem;
+	--mw-focus: 3px solid var(--mw-link);
+
+	--mw-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* The shell is a fixed header over a scrolling page, so the page itself
+   owns the background rather than each route's <main>. */
+html {
+	background: var(--mw-surface-sunken);
+}
+
+body {
+	margin: 0;
+	font-family: var(--mw-font);
+	color: var(--mw-text);
+}
+
+/* Anything anchored below the fixed top bar has to clear it when the
+   browser scrolls to a fragment. */
+:target {
+	scroll-margin-top: calc(var(--mw-topbar-height) + 1rem);
+}
