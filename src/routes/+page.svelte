@@ -20,19 +20,18 @@
 		<p class="tagline">Small games that teach algorithms, mathematics, and music.</p>
 	</header>
 
-	{#if data.games.length > 0}
-		<!-- A real list, so a screen reader announces how many games there
-		     are before reading them (#26). -->
-		<ul class="games">
-			{#each data.games as game (game.id)}
-				<li>
-					<GameCard {game} />
-				</li>
-			{/each}
-		</ul>
-	{:else}
-		<p class="empty">No games are published yet. Check back soon.</p>
-	{/if}
+	<ul class="games">
+		<li>
+			<a class="tile" href="/games/piano-dash">
+				<img src="/games/piano-dash-thumbnail.png" alt="Piano Dash" />
+			</a>
+		</li>
+		{#each data.games as game (game.id)}
+			<li>
+				<GameCard {game} />
+			</li>
+		{/each}
+	</ul>
 </main>
 
 <style>
@@ -53,7 +52,7 @@
 		text-align: center;
 	}
 
-	img {
+	header img {
 		max-width: 100%;
 		height: auto;
 	}
@@ -79,9 +78,28 @@
 		list-style: none;
 	}
 
-	.empty {
-		padding: 3rem 1rem;
-		text-align: center;
-		color: #595959;
+	.tile {
+		display: block;
+		overflow: hidden;
+		border: 1px solid #ddd;
+		border-radius: 0.5rem;
+		background: #fff;
+		min-height: 44px;
+	}
+
+	.tile img {
+		display: block;
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+	}
+
+	.tile:hover {
+		border-color: #999;
+	}
+
+	.tile:focus-visible {
+		outline: 3px solid #0b57d0;
+		outline-offset: 2px;
 	}
 </style>

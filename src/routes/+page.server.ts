@@ -11,5 +11,9 @@ import { internalApiTarget } from '$lib/api-target.server';
 // The registry is public, so nothing secret reaches the page -- the
 // server merely knows where to ask for it.
 export const load: PageServerLoad = async ({ fetch }) => {
-	return { games: await fetchGames(fetch, internalApiTarget()) };
+	try {
+		return { games: await fetchGames(fetch, internalApiTarget()) };
+	} catch {
+		return { games: [] };
+	}
 };
