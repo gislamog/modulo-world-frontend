@@ -16,7 +16,7 @@
 
 <main>
 	<header>
-		<img src="/logo.png" alt="ModuloWorld" width="320" />
+		<h1>ModuloWorld</h1>
 		<p class="tagline">Small games that teach algorithms, mathematics, and music.</p>
 	</header>
 
@@ -53,9 +53,10 @@
 		text-align: center;
 	}
 
-	img {
-		max-width: 100%;
-		height: auto;
+	h1 {
+		margin: 0;
+		font-size: 2rem;
+		color: #1a1a1a;
 	}
 
 	.tagline {
