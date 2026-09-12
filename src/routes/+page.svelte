@@ -12,11 +12,18 @@
 <svelte:head>
 	<title>ModuloWorld</title>
 	<meta name="description" content="Small games that teach algorithms, mathematics, and music." />
+	<link
+		rel="preload"
+		href="/fonts/fredericka-the-great/FrederickatheGreat-Regular.ttf"
+		as="font"
+		type="font/ttf"
+		crossorigin="anonymous"
+	/>
 </svelte:head>
 
 <main>
 	<header>
-		<img src="/logo.png" alt="ModuloWorld" width="320" />
+		<h1>modulo world</h1>
 		<p class="tagline">Small games that teach algorithms, mathematics, and music.</p>
 	</header>
 
@@ -53,9 +60,21 @@
 		text-align: center;
 	}
 
-	img {
-		max-width: 100%;
-		height: auto;
+	@font-face {
+		font-family: 'Fredericka the Great';
+		src: url('/fonts/fredericka-the-great/FrederickatheGreat-Regular.ttf') format('truetype');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	h1 {
+		margin: 0;
+		font-family: 'Fredericka the Great', serif;
+		font-weight: 400;
+		font-size: clamp(2.5rem, 8vw, 4.5rem);
+		line-height: 1.15;
+		color: #1a1a1a;
 	}
 
 	.tagline {
